@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WH Questions">
+<title>WH Question Cards – Pack of 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────── TOKENS ─────────────────────────── */
+:root {
+  --who:   #FF6B9D; --who-bg:   #FFF0F6; --who-g:   linear-gradient(145deg,#FF6B9D,#FF9DC5);
+  --what:  #3B9EFF; --what-bg:  #EFF7FF; --what-g:  linear-gradient(145deg,#3B9EFF,#82C4FF);
+  --where: #2DC98C; --where-bg: #EFFAF5; --where-g: linear-gradient(145deg,#2DC98C,#6FDDBB);
+  --when:  #FF9500; --when-bg:  #FFF6EE; --when-g:  linear-gradient(145deg,#FF9500,#FFC56A);
+  --why:   #AF52DE; --why-bg:   #F8EFFE; --why-g:   linear-gradient(145deg,#AF52DE,#D08CEF);
+  --how:   #00C7BE; --how-bg:   #EDFAFA; --how-g:   linear-gradient(145deg,#00C7BE,#60E0DB);
+  --bg:    #FFF9F0;
+  --r:     26px;
+  --font:  'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+/* ─────────────────────────── RESET ─────────────────────────── */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body {
+  font-family:var(--font);
+  background:var(--bg);
+  min-height:100dvh;
+  display:flex; flex-direction:column; align-items:center;
+  overflow-x:hidden;
+  padding-bottom:calc(20px + env(safe-area-inset-bottom));
+}
+
+/* ─────────────────────────── HEADER ─────────────────────────── */
+header {
+  width:100%; background:#fff;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+  position:sticky; top:0; z-index:20;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 0;
+}
+.header-top { display:flex; align-items:center; justify-content:space-between; gap:8px; padding-bottom:10px; }
+.header-top h1 { font-size:1.2rem; font-weight:900; color:#222; letter-spacing:-.3px; flex:1; text-align:center; }
+.header-top .badge {
+  font-size:.65rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
+  background:#f0f0f0; color:#888; padding:3px 10px; border-radius:50px;
+}
+.home-btn {
+  background:#f5f5f5; border:none; border-radius:12px;
+  width:40px; height:40px; font-size:1.2rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:background .15s;
+}
+.home-btn:active { background:#e8e8e8; }
+
+/* ─────────────────────────── TABS ─────────────────────────── */
+.tab-scroll {
+  display:flex; overflow-x:auto; gap:6px; padding:0 12px 12px;
+  scrollbar-width:none; -ms-overflow-style:none;
+  scroll-snap-type:x mandatory;
+}
+.tab-scroll::-webkit-scrollbar { display:none; }
+.tab-btn {
+  flex:0 0 auto; scroll-snap-align:start;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:7px 14px; border:none; border-radius:14px;
+  font-family:var(--font); font-size:.75rem; font-weight:800;
+  background:#f3f3f3; color:#aaa; cursor:pointer;
+  transition:all .2s ease; white-space:nowrap;
+}
+.tab-btn .tab-icon { font-size:1.3rem; }
+.tab-btn.active { color:#fff; transform:scale(1.05); box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.tab-btn[data-mode="who"].active   { background:var(--who); }
+.tab-btn[data-mode="what"].active  { background:var(--what); }
+.tab-btn[data-mode="where"].active { background:var(--where); }
+.tab-btn[data-mode="when"].active  { background:var(--when); }
+.tab-btn[data-mode="why"].active   { background:var(--why); }
+.tab-btn[data-mode="how"].active   { background:var(--how); }
+
+/* ─────────────────────────── MAIN ─────────────────────────── */
+main {
+  width:100%; max-width:430px;
+  padding:18px 16px; display:flex;
+  flex-direction:column; align-items:center; gap:16px;
+}
+
+/* ─────────────────────────── STARS ─────────────────────────── */
+.stars-row { display:flex; gap:5px; align-items:center; }
+.star { font-size:1.4rem; opacity:.2; transition:all .35s cubic-bezier(.34,1.56,.64,1); }
+.star.lit { opacity:1; transform:scale(1.3) rotate(-8deg); }
+
+/* ─────────────────────────── PROGRESS ─────────────────────────── */
+.prog-wrap { width:100%; }
+.prog-bar { height:9px; background:#EBEBEB; border-radius:50px; overflow:hidden; }
+.prog-fill { height:100%; border-radius:50px; transition:width .45s ease; }
+.prog-label { font-size:.75rem; font-weight:700; color:#bbb; text-align:right; margin-top:4px; }
+
+/* ─────────────────────────── CARD SCENE ─────────────────────────── */
+.card-scene { width:100%; perspective:1400px; cursor:pointer; }
+.card-inner {
+  width:100%; min-height:330px; position:relative;
+  transform-style:preserve-3d;
+  transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  border-radius:var(--r);
+}
+.card-inner.flipped { transform:rotateY(180deg); }
+
+.card-face {
+  position:absolute; inset:0; border-radius:var(--r);
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:24px 20px; gap:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.09);
+}
+
+/* — Front — */
+.card-front { background:#fff; }
+.q-badge {
+  font-size:.75rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:1.5px; padding:4px 14px; border-radius:50px; margin-bottom:2px;
+}
+.card-scene-emoji {
+  font-size:1.6rem; letter-spacing:4px; margin-bottom:2px;
+  animation:emojiScene .35s ease both;
+}
+@keyframes emojiScene { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+.card-main-emoji {
+  font-size:7.5rem; line-height:1;
+  filter:drop-shadow(0 5px 12px rgba(0,0,0,.1));
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn { from{transform:scale(.4);opacity:0} to{transform:scale(1);opacity:1} }
+.card-question {
+  font-size:1.05rem; font-weight:800; color:#444; text-align:center;
+  max-width:260px; line-height:1.35; margin-top:4px;
+}
+.tap-label {
+  font-size:.8rem; color:#ccc; font-weight:700; margin-top:6px; display:flex; gap:4px; align-items:center;
+}
+
+/* — Back — */
+.card-back { transform:rotateY(180deg); }
+.cat-tag {
+  font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;
+  background:rgba(255,255,255,.22); padding:3px 12px; border-radius:50px; color:#fff;
+}
+.back-emoji { font-size:4.5rem; }
+.answer-big {
+  font-size:2.2rem; font-weight:900; text-align:center; color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,.15);
+  animation:answerIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  max-width:290px; line-height:1.2;
+}
+@keyframes answerIn { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+.fun-fact {
+  font-size:.92rem; font-weight:600; text-align:center; color:rgba(255,255,255,.92);
+  background:rgba(255,255,255,.18); padding:9px 16px; border-radius:14px;
+  max-width:280px; line-height:1.4;
+}
+
+/* ─────────────────────────── BUTTONS ─────────────────────────── */
+.btn-row { display:flex; gap:10px; width:100%; }
+.btn {
+  flex:1; border:none; border-radius:16px; padding:15px;
+  font-size:1rem; font-weight:800; cursor:pointer;
+  font-family:var(--font); display:flex; align-items:center; justify-content:center; gap:5px;
+  transition:transform .15s, box-shadow .15s;
+}
+.btn:active { transform:scale(.96); }
+.btn-prev { background:#f0f0f0; color:#999; }
+.btn-next { color:#fff; }
+
+/* ─────────────────────────── CONFETTI ─────────────────────────── */
+.confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:99; overflow:hidden; }
+.cp {
+  position:absolute; top:-20px; border-radius:2px;
+  animation:fall 1.7s ease-in forwards;
+}
+@keyframes fall {
+  0%   { transform:translateY(0) rotate(0deg);   opacity:1; }
+  100% { transform:translateY(110vh) rotate(700deg); opacity:0; }
+}
+
+/* ─────────────────────────── REWARD POPUP ─────────────────────────── */
+.reward-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  display:flex; align-items:center; justify-content:center;
+  z-index:200; opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.reward-overlay.show { opacity:1; pointer-events:auto; }
+.reward-bubble {
+  background:#fff; border-radius:28px; padding:30px 26px;
+  text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.25); max-width:300px; width:88%;
+  animation:bubblePop .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes bubblePop { from{transform:scale(.4)} to{transform:scale(1)} }
+.reward-bubble .r-emoji { font-size:5rem; }
+.reward-bubble h2 { font-size:1.7rem; font-weight:900; color:#222; margin:8px 0 4px; }
+.reward-bubble p  { font-size:.95rem; color:#888; font-weight:600; }
+.reward-bubble .r-btn {
+  margin-top:18px; padding:12px 36px;
+  border:none; border-radius:50px; font-size:1rem; font-weight:800;
+  font-family:var(--font); cursor:pointer; color:#fff;
+}
+
+/* ─────────────────────────── INTRO SCREEN ─────────────────────────── */
+.intro-screen {
+  position:fixed; inset:0; background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  z-index:300; padding:24px; text-align:center;
+  transition:opacity .4s;
+}
+.intro-screen.hidden { opacity:0; pointer-events:none; }
+.intro-logo { font-size:5rem; margin-bottom:8px; }
+.intro-screen h1 { font-size:1.8rem; font-weight:900; color:#222; margin-bottom:6px; }
+.intro-screen p { font-size:1rem; color:#888; font-weight:600; max-width:280px; margin-bottom:24px; line-height:1.5; }
+.pack-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; max-width:320px; margin-bottom:28px; }
+.pack-chip {
+  border-radius:14px; padding:10px 6px; font-size:.85rem; font-weight:800;
+  display:flex; flex-direction:column; align-items:center; gap:3px; color:#fff;
+}
+.intro-start-btn {
+  padding:16px 48px; border:none; border-radius:50px;
+  font-size:1.15rem; font-weight:900; font-family:var(--font); color:#fff; cursor:pointer;
+  background:linear-gradient(135deg,#FF6B9D,#AF52DE,#3B9EFF);
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+}
+</style>
+</head>
+<body>
+
+<!-- Confetti -->
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<!-- Reward Popup -->
+<div class="reward-overlay" id="rewardOverlay">
+  <div class="reward-bubble">
+    <div class="r-emoji" id="rEmoji">🌟</div>
+    <h2 id="rTitle">Superstar!</h2>
+    <p id="rSub">Keep going!</p>
+    <button class="r-btn" id="rBtn" onclick="closeReward()">Keep Going! ▶</button>
+  </div>
+</div>
+
+<!-- Intro Screen -->
+<div class="intro-screen" id="introScreen">
+  <div class="intro-logo">🧠</div>
+  <h1>WH Question Cards</h1>
+  <p>Pack of 6 · Ages 4 & Up<br>Tap cards to discover answers!</p>
+  <div class="pack-grid">
+    <div class="pack-chip" style="background:var(--who)">  <span>👤</span><span>WHO</span>  </div>
+    <div class="pack-chip" style="background:var(--what)"> <span>🔍</span><span>WHAT</span> </div>
+    <div class="pack-chip" style="background:var(--where)"><span>📍</span><span>WHERE</span></div>
+    <div class="pack-chip" style="background:var(--when)"> <span>⏰</span><span>WHEN</span> </div>
+    <div class="pack-chip" style="background:var(--why)">  <span>💡</span><span>WHY</span>  </div>
+    <div class="pack-chip" style="background:var(--how)">  <span>🛠️</span><span>HOW</span>  </div>
+  </div>
+  <button class="intro-start-btn" onclick="startApp()">Let's Begin! 🚀</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <button class="home-btn" onclick="goHome()" title="Home">🏠</button>
+    <h1>🧠 WH Question Cards</h1>
+    <span class="badge">Pack of 6</span>
+  </div>
+  <div class="tab-scroll" id="tabScroll">
+    <button class="tab-btn active" data-mode="who"   onclick="switchMode('who')"  ><span class="tab-icon">👤</span>WHO</button>
+    <button class="tab-btn"        data-mode="what"  onclick="switchMode('what')" ><span class="tab-icon">🔍</span>WHAT</button>
+    <button class="tab-btn"        data-mode="where" onclick="switchMode('where')"><span class="tab-icon">📍</span>WHERE</button>
+    <button class="tab-btn"        data-mode="when"  onclick="switchMode('when')" ><span class="tab-icon">⏰</span>WHEN</button>
+    <button class="tab-btn"        data-mode="why"   onclick="switchMode('why')"  ><span class="tab-icon">💡</span>WHY</button>
+    <button class="tab-btn"        data-mode="how"   onclick="switchMode('how')"  ><span class="tab-icon">🛠️</span>HOW</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <div class="stars-row" id="starsRow">
+    <span class="star" id="st1">⭐</span><span class="star" id="st2">⭐</span>
+    <span class="star" id="st3">⭐</span><span class="star" id="st4">⭐</span>
+    <span class="star" id="st5">⭐</span>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-label" id="progLabel">Card 1 of 15</div>
+  </div>
+
+  <div class="card-scene" onclick="flipCard()" id="cardScene">
+    <div class="card-inner" id="cardInner">
+      <!-- FRONT -->
+      <div class="card-face card-front">
+        <span class="q-badge" id="qBadge">WHO is this? 👤</span>
+        <div class="card-scene-emoji" id="sceneEmoji"></div>
+        <div class="card-main-emoji" id="mainEmoji">👩‍🍳</div>
+        <div class="card-question"  id="cardQuestion">Tap to find out!</div>
+        <div class="tap-label">👆 Tap the card to reveal</div>
+      </div>
+      <!-- BACK -->
+      <div class="card-face card-back" id="cardBack">
+        <span class="cat-tag" id="backCat">Family</span>
+        <div class="back-emoji" id="backEmoji">👩‍🍳</div>
+        <div class="answer-big"  id="answerBig">Cook!</div>
+        <div class="fun-fact"    id="funFact">Cooks make yummy food for us! 🍲</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-prev" onclick="goHome()">🏠 Home</button>
+    <button class="btn btn-next" id="btnNext" onclick="nextCard()">Next →</button>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════ DECK DATA ═══════════════════════════ */
+const DECKS = {
+
+who: [
+  { scene:'',    emoji:'👩‍🍳', q:'Who cooks our yummy food?',       cat:'Jobs',    ans:'A Cook!',           fact:'Cooks use many ingredients to make delicious meals for us! 🍲' },
+  { scene:'🏥',  emoji:'👨‍⚕️', q:'Who helps us when we are sick?',  cat:'Jobs',    ans:'A Doctor!',         fact:'Doctors check our body and give us medicine to feel better! 💊' },
+  { scene:'🏫',  emoji:'👩‍🏫', q:'Who teaches us at school?',       cat:'Jobs',    ans:'A Teacher!',        fact:'Teachers help us learn letters, numbers and so much more! 📚' },
+  { scene:'🚨',  emoji:'👮', q:'Who keeps our streets safe?',        cat:'Jobs',    ans:'A Police Officer!', fact:'Police officers protect our community every day! 🛡️' },
+  { scene:'🔥',  emoji:'👩‍🚒', q:'Who puts out big fires?',         cat:'Jobs',    ans:'A Firefighter!',    fact:'Firefighters are very brave and save lives! 🚒' },
+  { scene:'🌾',  emoji:'🧑‍🌾', q:'Who grows our food on a farm?',   cat:'Jobs',    ans:'A Farmer!',         fact:'Farmers wake up early every day to grow fruits and vegetables! 🥕' },
+  { scene:'❤️',  emoji:'👩', q:'Who loves you and takes care of you?', cat:'Family', ans:'Mummy!',          fact:'Mummy gives the best hugs and always keeps you safe! 🤗' },
+  { scene:'💪',  emoji:'👨', q:'Who is like your superhero at home?',  cat:'Family', ans:'Daddy!',           fact:'Daddy is strong and loves to play and protect you! 🦸' },
+  { scene:'📖',  emoji:'👵', q:'Who tells the best bedtime stories?',  cat:'Family', ans:'Grandma!',         fact:'Grandmas are full of love and wonderful stories! 🌹' },
+  { scene:'🎁',  emoji:'👴', q:'Who gives the biggest bear hugs?',     cat:'Family', ans:'Grandpa!',         fact:'Grandpas love to share their wisdom and fun memories! 🎣' },
+  { scene:'🌳',  emoji:'🐶', q:'Who is a loyal furry friend?',         cat:'Animals','ans':'A Dog!',          fact:'Dogs wag their tails when they are happy to see you! 🐾' },
+  { scene:'😺',  emoji:'🐱', q:'Who says "meow" and loves to purr?',   cat:'Animals','ans':'A Cat!',          fact:'Cats purr when they feel cosy and happy! 😻' },
+  { scene:'🌊',  emoji:'🐬', q:'Who swims and leaps in the ocean?',    cat:'Animals','ans':'A Dolphin!',      fact:'Dolphins are very clever and love to play! 🌊' },
+  { scene:'🌿',  emoji:'🦒', q:'Who has the longest neck of all?',     cat:'Animals','ans':'A Giraffe!',      fact:'Giraffes use their long necks to eat leaves from tall trees! 🍃' },
+  { scene:'🌸',  emoji:'🦋', q:'Who has colourful wings and flies?',   cat:'Animals','ans':'A Butterfly!',   fact:'Butterflies start life as caterpillars before they transform! 🐛' },
+],
+
+what: [
+  { scene:'🌳',  emoji:'🍎', q:'What is red, round and crunchy?',           cat:'Food',     ans:'An Apple!',    fact:'Apples are full of vitamins that keep us healthy! 💪' },
+  { scene:'🌴',  emoji:'🍌', q:'What is yellow, long and sweet?',           cat:'Food',     ans:'A Banana!',    fact:'Monkeys love bananas and so do we! 🐒' },
+  { scene:'🌱',  emoji:'🥦', q:'What green vegetable looks like a tiny tree?', cat:'Food',  ans:'Broccoli!',    fact:'Broccoli is packed with goodness to make you strong! 💚' },
+  { scene:'🌞',  emoji:'⭐', q:'What shines brightly in the night sky?',    cat:'Nature',   ans:'A Star!',      fact:'Stars are giant balls of fire very far away in space! 🌌' },
+  { scene:'🌧️',  emoji:'🌈', q:'What appears after rain in the sky?',       cat:'Nature',   ans:'A Rainbow!',   fact:'A rainbow has 7 beautiful colours: red, orange, yellow, green, blue, indigo, violet! 🎨' },
+  { scene:'🏖️',  emoji:'🌊', q:'What crashes onto the beach with a whoosh?',cat:'Nature',   ans:'A Wave!',      fact:'Waves are made by wind blowing across the ocean! 🌬️' },
+  { scene:'🛣️',  emoji:'🚗', q:'What has four wheels and goes zoom?',       cat:'Vehicles', ans:'A Car!',       fact:'Cars run on petrol or electricity to take us places! ⚡' },
+  { scene:'☁️',  emoji:'✈️', q:'What flies high above the clouds?',         cat:'Vehicles', ans:'An Aeroplane!',fact:'Aeroplanes can travel to the other side of the world! 🌍' },
+  { scene:'🌊',  emoji:'🚢', q:'What big vehicle sails on the ocean?',      cat:'Vehicles', ans:'A Ship!',      fact:'Ships can carry thousands of people or huge loads of cargo! ⚓' },
+  { scene:'🛤️',  emoji:'🚂', q:'What travels on rails and goes choo choo?', cat:'Vehicles', ans:'A Train!',     fact:'The world\'s fastest trains can go over 600 km/h! 💨' },
+  { scene:'📚',  emoji:'🎸', q:'What instrument has strings you can pluck?', cat:'Music',   ans:'A Guitar!',    fact:'Guitars can make soft or loud sounds depending on how you play! 🎵' },
+  { scene:'🏠',  emoji:'🛏️', q:'What soft thing do we sleep on at night?',  cat:'Home',     ans:'A Bed!',       fact:'A good night\'s sleep helps your brain and body grow! 💤' },
+  { scene:'☀️',  emoji:'🌂', q:'What keeps us dry when it rains?',          cat:'Objects',  ans:'An Umbrella!', fact:'The word umbrella comes from the Latin word for "shade"! 🌧️' },
+  { scene:'🧁',  emoji:'🎂', q:'What do we blow candles on for our birthday?',cat:'Objects', ans:'A Birthday Cake!',fact:'The tradition of birthday cakes started in ancient Greece! 🎉' },
+  { scene:'🎨',  emoji:'🖌️', q:'What do we use to paint colourful pictures?', cat:'Objects', ans:'A Paintbrush!',fact:'Artists use brushes to create amazing works of art! 🖼️' },
+],
+
+where: [
+  { scene:'📚🎒', emoji:'🏫', q:'Where do we go to learn and study?',          cat:'Places',   ans:'At School!',       fact:'At school you make friends and discover amazing new things every day! 🌟' },
+  { scene:'💊🩺', emoji:'🏥', q:'Where do doctors and nurses work?',            cat:'Places',   ans:'At a Hospital!',   fact:'Hospitals have special rooms and tools to help sick people get better! 🩻' },
+  { scene:'🛒🍎', emoji:'🏪', q:'Where do we buy fruits, milk and food?',       cat:'Places',   ans:'At the Market!',   fact:'Supermarkets can have over 50,000 different products to choose from! 🛍️' },
+  { scene:'✈️🧳', emoji:'🏢', q:'Where do aeroplanes take off and land?',       cat:'Places',   ans:'At the Airport!',  fact:'The busiest airports handle over 100,000 passengers every single day! ✈️' },
+  { scene:'🐘🦁', emoji:'🌿', q:'Where can we see lions, elephants and tigers?', cat:'Places',  ans:'At the Zoo!',      fact:'Zoos help protect animals that are at risk of disappearing! 🦁' },
+  { scene:'🌊🏖️', emoji:'🐚', q:'Where do we find sand, waves and crabs?',     cat:'Places',   ans:'At the Beach!',    fact:'The ocean covers more than 70% of the Earth\'s surface! 🌍' },
+  { scene:'🌳🌺', emoji:'🛝', q:'Where do children play on swings and slides?', cat:'Places',   ans:'At the Park!',     fact:'Playing outside in parks helps your body stay strong and healthy! 🌞' },
+  { scene:'📖📰', emoji:'🏛️', q:'Where do we borrow books to read at home?',   cat:'Places',   ans:'At the Library!',  fact:'Some libraries have millions and millions of books! 📚' },
+  { scene:'🔥🌡️', emoji:'☀️', q:'Where does the sun live in the daytime?',     cat:'Nature',   ans:'In the Sky!',      fact:'The sun is a giant star about 150 million km away from us! 🌠' },
+  { scene:'🌙⭐', emoji:'🌌', q:'Where do stars twinkle every night?',          cat:'Nature',   ans:'In the Night Sky!',fact:'On a clear night you can see up to 5,000 stars with just your eyes! 🔭' },
+  { scene:'🐠🪸', emoji:'🌊', q:'Where do fish, sharks and dolphins live?',     cat:'Nature',   ans:'In the Ocean!',    fact:'The ocean is home to over one million different species of creatures! 🐙' },
+  { scene:'🌱💧', emoji:'🌳', q:'Where does a squirrel like to climb and hide?',cat:'Nature',   ans:'In a Tree!',       fact:'Some trees can live for thousands of years! 🌲' },
+  { scene:'🥛🧈', emoji:'🐄', q:'Where does milk and butter come from?',        cat:'Nature',   ans:'From a Cow!',      fact:'A cow can produce up to 40 litres of milk every single day! 🍼' },
+  { scene:'🍯🌸', emoji:'🐝', q:'Where does delicious honey come from?',        cat:'Nature',   ans:'From Bees!',       fact:'A bee visits up to 5,000 flowers just to make one jar of honey! 🌻' },
+  { scene:'💤😴', emoji:'🛏️', q:'Where do we sleep and rest at night?',         cat:'Home',     ans:'In Our Bedroom!',  fact:'While you sleep, your brain sorts out everything you learned that day! 💡' },
+],
+
+when: [
+  { scene:'🌅☕', emoji:'🌞', q:'When does the sun rise in the sky?',             cat:'Time',     ans:'In the Morning!',    fact:'Early morning is the best time to hear birds singing! 🐦' },
+  { scene:'😴🌙', emoji:'⭐', q:'When do stars come out to shine?',               cat:'Time',     ans:'At Night!',           fact:'Stars are always there — we just can\'t see them in the daytime! ☀️' },
+  { scene:'🍂🌬️', emoji:'🍁', q:'When do leaves turn orange and fall?',           cat:'Seasons',  ans:'In Autumn!',          fact:'Trees drop their leaves in autumn to save energy for winter! 🌳' },
+  { scene:'❄️⛄', emoji:'🌨️', q:'When does snow fall and it gets very cold?',     cat:'Seasons',  ans:'In Winter!',          fact:'Snowflakes are tiny ice crystals — every single one is unique! ❄️' },
+  { scene:'🌸🌱', emoji:'🌷', q:'When do flowers bloom and birds sing more?',     cat:'Seasons',  ans:'In Spring!',          fact:'Spring is the season when baby animals are born! 🐣' },
+  { scene:'🏖️😎', emoji:'☀️', q:'When is it hot and we swim in the sea?',         cat:'Seasons',  ans:'In Summer!',          fact:'Summer days are long because the Earth tilts towards the sun! 🌍' },
+  { scene:'🎂🎈', emoji:'🎉', q:'When do we celebrate with cake and presents?',   cat:'Events',   ans:'On a Birthday!',      fact:'Birthdays are special because they celebrate the day you arrived! 🌟' },
+  { scene:'🎊✨', emoji:'🥂', q:'When do fireworks light up the midnight sky?',   cat:'Events',   ans:'On New Year\'s Eve!',  fact:'People all over the world celebrate the new year at midnight! 🌍' },
+  { scene:'🛁🧼', emoji:'🚿', q:'When should we wash our body with soap?',        cat:'Daily',    ans:'Every Day!',           fact:'Washing keeps germs away so we stay healthy and fresh! 🧴' },
+  { scene:'🦷😁', emoji:'🪥', q:'When do we brush our teeth?',                    cat:'Daily',    ans:'Morning & Night!',    fact:'Brushing teeth removes sugar and germs to keep them strong! 🦷' },
+  { scene:'🍽️🥄', emoji:'🌅', q:'When do we eat our first meal of the day?',      cat:'Daily',    ans:'At Breakfast!',       fact:'Breakfast gives your brain and body the energy to start the day! ⚡' },
+  { scene:'💤😴', emoji:'🛏️', q:'When do we put on pyjamas and close our eyes?',  cat:'Daily',    ans:'At Bedtime!',         fact:'Children need about 10–12 hours of sleep to grow and learn well! 💪' },
+  { scene:'🌧️☔', emoji:'🌈', q:'When does a beautiful rainbow appear?',          cat:'Nature',   ans:'After Rain & Sunshine!', fact:'You need both rain and sunshine at the same time to see a rainbow! 🌦️' },
+  { scene:'🌸🐝', emoji:'🌻', q:'When do sunflowers and bees come out?',          cat:'Nature',   ans:'In Warm Weather!',    fact:'Bees are most active on sunny warm days! ☀️' },
+  { scene:'🎃🕯️', emoji:'👻', q:'When do children dress up in costumes and trick-or-treat?', cat:'Events', ans:'On Halloween!', fact:'Halloween is celebrated on October 31st every year! 🍬' },
+],
+
+why: [
+  { scene:'🌧️💧', emoji:'☔', q:'Why do we wear a raincoat outside?',             cat:'Safety',   ans:'To Stay Dry!',              fact:'Raincoats are waterproof, so water slides right off! 💦' },
+  { scene:'❄️🥶', emoji:'🧥', q:'Why do we wear a warm coat in winter?',           cat:'Safety',   ans:'To Keep Warm!',             fact:'Our body needs to stay warm to work properly! 🔥' },
+  { scene:'☀️😎', emoji:'🕶️', q:'Why do we wear sunscreen at the beach?',          cat:'Safety',   ans:'To Protect Our Skin!',      fact:'The sun gives off UV rays that can burn our skin if we\'re not careful! ⚠️' },
+  { scene:'🦠🤒', emoji:'🧼', q:'Why do we wash our hands before eating?',         cat:'Health',   ans:'To Remove Germs!',          fact:'Germs are tiny invisible things that can make us sick! 🔬' },
+  { scene:'💪🌿', emoji:'🥦', q:'Why do we eat fruits and vegetables?',            cat:'Health',   ans:'To Stay Healthy!',          fact:'Fruits and vegetables are packed with vitamins your body needs! ✅' },
+  { scene:'💧☀️', emoji:'🌱', q:'Why do plants need water and sunlight?',          cat:'Nature',   ans:'To Grow and Live!',         fact:'Plants make their own food using sunlight in a process called photosynthesis! 🌿' },
+  { scene:'🐦🌳', emoji:'🪹', q:'Why do birds build nests?',                       cat:'Animals',  ans:'To Keep Eggs Safe!',        fact:'A bird\'s nest is like a cosy little home for baby chicks! 🐣' },
+  { scene:'❄️🐻', emoji:'😴', q:'Why do bears sleep all through winter?',          cat:'Animals',  ans:'To Save Energy!',           fact:'This long winter sleep is called hibernation! 🌨️' },
+  { scene:'🌸🌻', emoji:'🐝', q:'Why do bees visit flowers?',                      cat:'Animals',  ans:'To Collect Nectar for Honey!', fact:'Bees also spread pollen which helps plants grow fruits! 🍓' },
+  { scene:'🌙😴', emoji:'💤', q:'Why do we need to sleep every night?',            cat:'Health',   ans:'To Rest and Grow!',         fact:'Your brain sorts memories and your body repairs itself while you sleep! 🧠' },
+  { scene:'🌧️🌱', emoji:'🌧️', q:'Why does rain fall from the sky?',               cat:'Nature',   ans:'So Plants Can Drink Water!',fact:'Rain is part of the water cycle — water evaporates, forms clouds and falls back down! ☁️' },
+  { scene:'🚦🚗', emoji:'🔴', q:'Why do we stop at a red traffic light?',          cat:'Safety',   ans:'To Stay Safe!',             fact:'Traffic lights help cars and people take turns safely! 🟢' },
+  { scene:'🌍🔥', emoji:'🌡️', q:'Why should we save electricity at home?',         cat:'Planet',   ans:'To Help the Earth!',        fact:'Using less electricity means less pollution and a healthier planet! ♻️' },
+  { scene:'📚✏️', emoji:'🏫', q:'Why do we go to school every day?',               cat:'Learning', ans:'To Learn New Things!',      fact:'Every single day at school, your brain gets bigger and smarter! 💡' },
+  { scene:'👫🤝', emoji:'😊', q:'Why do we share our toys with friends?',          cat:'Values',   ans:'Because Sharing is Caring!',fact:'Sharing makes both people happy and helps us make great friends! 🌈' },
+],
+
+how: [
+  { scene:'🌱💧', emoji:'🌻', q:'How does a tiny seed become a big flower?',       cat:'Nature',   ans:'With Water & Sunlight!',    fact:'A seed has everything it needs to grow — it just needs water and light to wake up! ☀️' },
+  { scene:'🐛🍃', emoji:'🦋', q:'How does a caterpillar turn into a butterfly?',   cat:'Nature',   ans:'By Making a Cocoon!',       fact:'Inside a cocoon, the caterpillar completely transforms! This is called metamorphosis! 🔄' },
+  { scene:'🌊☁️', emoji:'💧', q:'How does water get from the sea to the sky?',     cat:'Nature',   ans:'The Sun Heats It Up!',      fact:'This amazing process is called the water cycle — and it never stops! 🌍' },
+  { scene:'🎨✏️', emoji:'🖌️', q:'How do we make a beautiful painting?',            cat:'Create',   ans:'Mix Colours & Use a Brush!',fact:'Mixing red and yellow makes orange, and blue and yellow makes green! 🎨' },
+  { scene:'🍞🧀', emoji:'🥪', q:'How do we make a yummy sandwich?',                cat:'Food',     ans:'Layer Bread + Filling + Bread!', fact:'Sandwiches are named after the Earl of Sandwich who loved eating this way! 🍴' },
+  { scene:'🦷😁', emoji:'🪥', q:'How do we keep our teeth clean and strong?',      cat:'Health',   ans:'By Brushing Twice a Day!',  fact:'Brush for 2 minutes — that\'s as long as your favourite nursery rhyme! 🎵' },
+  { scene:'🤒💊', emoji:'🩺', q:'How does a doctor find out what\'s wrong?',       cat:'Health',   ans:'By Checking Your Body!',   fact:'Doctors use special tools like a stethoscope to listen to your heart! 💓' },
+  { scene:'📬🏠', emoji:'✉️', q:'How does a letter travel to someone far away?',   cat:'World',    ans:'By Post & Aeroplane!',      fact:'A letter can travel to the other side of the world in just one day! ✈️' },
+  { scene:'🌡️❄️', emoji:'🌧️', q:'How is snow made in the clouds?',                cat:'Nature',   ans:'Tiny Droplets Freeze!',     fact:'Each snowflake has six sides but no two snowflakes are ever the same! ❄️' },
+  { scene:'🎵🎶', emoji:'🎹', q:'How do we make music with a piano?',              cat:'Music',    ans:'By Pressing the Keys!',     fact:'A piano has 88 keys and can make thousands of different sounds! 🎵' },
+  { scene:'🏗️🧱', emoji:'🏠', q:'How is a house built?',                           cat:'World',    ans:'Brick by Brick!',           fact:'Building a house needs architects, engineers and many skilled workers! 👷' },
+  { scene:'🌾🥖', emoji:'🍞', q:'How does wheat turn into bread?',                  cat:'Food',     ans:'It\'s Ground, Mixed & Baked!', fact:'Wheat is ground into flour, mixed with water and yeast, then baked in an oven! 🔥' },
+  { scene:'🧲⚡', emoji:'💡', q:'How does a light bulb make light?',               cat:'Science',  ans:'Electricity Flows Through It!', fact:'Thomas Edison invented the lightbulb over 140 years ago! 💡' },
+  { scene:'🐾🦴', emoji:'🐶', q:'How do we train a puppy to sit and stay?',        cat:'Animals',  ans:'With Love, Practice & Treats!', fact:'Puppies learn best through kind, patient repetition! 🐾' },
+  { scene:'🌍🛸', emoji:'🚀', q:'How do astronauts travel to outer space?',        cat:'Science',  ans:'Inside a Rocket Ship!',     fact:'A rocket must travel at 28,000 km/h to escape Earth\'s gravity! 🌠' },
+],
+
+}; // end DECKS
+
+/* ═══════════════════════════ CONFIG ═══════════════════════════ */
+const COLORS = {
+  who:  { hex:'#FF6B9D', grad:'var(--who-g)',   prog:'#FF6B9D' },
+  what: { hex:'#3B9EFF', grad:'var(--what-g)',  prog:'#3B9EFF' },
+  where:{ hex:'#2DC98C', grad:'var(--where-g)', prog:'#2DC98C' },
+  when: { hex:'#FF9500', grad:'var(--when-g)',  prog:'#FF9500' },
+  why:  { hex:'#AF52DE', grad:'var(--why-g)',   prog:'#AF52DE' },
+  how:  { hex:'#00C7BE', grad:'var(--how-g)',   prog:'#00C7BE' },
+};
+const LABELS = {
+  who:'WHO is this? 👤', what:'WHAT is this? 🔍',
+  where:'WHERE? 📍', when:'WHEN? ⏰', why:'WHY? 💡', how:'HOW? 🛠️'
+};
+const REWARDS = [
+  { emoji:'🌟', title:'Super Star!',    sub:'3 cards done! Brilliant!' },
+  { emoji:'🦋', title:'Flying High!',   sub:'6 cards! You\'re amazing!' },
+  { emoji:'🏆', title:'Champion!',      sub:'9 cards! Keep it up!' },
+  { emoji:'🚀', title:'Rocket Kid!',    sub:'12 cards! To the moon!' },
+  { emoji:'👑', title:'Card Royalty!',  sub:'All 5 stars! INCREDIBLE! 🎊' },
+];
+const STAR_AT = [3, 6, 9, 12, 15];
+const CONFETTI = ['#FF6B9D','#3B9EFF','#2DC98C','#FF9500','#AF52DE','#00C7BE','#FFD93D'];
+
+/* ═══════════════════════════ STATE ═══════════════════════════ */
+let mode='who', deck=[], idx=0, flipped=false, starsEarned=0, cardsViewed=0;
+
+/* ═══════════════════════════ HELPERS ═══════════════════════════ */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a; }
+
+function startApp(){
+  const s = document.getElementById('introScreen');
+  s.classList.add('hidden');
+  setTimeout(()=>{ s.style.display='none'; }, 400);
+}
+
+function goHome(){
+  const s = document.getElementById('introScreen');
+  s.style.display='flex';
+  // small delay so display:flex takes effect before opacity transition
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ s.classList.remove('hidden'); });
+  });
+}
+
+function switchMode(m){
+  mode=m; deck=shuffle([...DECKS[m]]); idx=0; flipped=false;
+  starsEarned=0; cardsViewed=0; updateStars(0);
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.className='tab-btn'+(b.dataset.mode===m?' active':'');
+  });
+  // scroll active tab into view
+  const activeTab=document.querySelector('.tab-btn.active');
+  if(activeTab) activeTab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  renderCard();
+}
+
+function renderCard(){
+  const c=deck[idx], col=COLORS[mode];
+  // Reset flip
+  document.getElementById('cardInner').classList.remove('flipped'); flipped=false;
+  // Re-trigger animation
+  const me=document.getElementById('mainEmoji');
+  me.style.animation='none'; void me.offsetWidth; me.style.animation='';
+  // Front
+  document.getElementById('qBadge').textContent=LABELS[mode];
+  document.getElementById('qBadge').style.background=col.hex+'22';
+  document.getElementById('qBadge').style.color=col.hex;
+  document.getElementById('sceneEmoji').textContent=c.scene||'';
+  document.getElementById('mainEmoji').textContent=c.emoji;
+  document.getElementById('cardQuestion').textContent=c.q;
+  // Back
+  document.getElementById('cardBack').style.background=col.grad;
+  document.getElementById('backCat').textContent=c.cat;
+  document.getElementById('backEmoji').textContent=c.emoji;
+  document.getElementById('answerBig').textContent=c.ans;
+  document.getElementById('funFact').textContent=c.fact;
+  // Next btn
+  const nb=document.getElementById('btnNext');
+  nb.style.background=col.hex;
+  nb.style.boxShadow=`0 5px 16px ${col.hex}55`;
+  // Progress
+  const pct=Math.round(((idx+1)/deck.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progFill').style.background=col.prog;
+  document.getElementById('progLabel').textContent=`Card ${idx+1} of ${deck.length}`;
+}
+
+function flipCard(){
+  if(!flipped){
+    document.getElementById('cardInner').classList.add('flipped');
+    flipped=true; cardsViewed++;
+    checkReward();
+  }
+}
+function nextCard(){ idx=(idx+1)%deck.length; if(idx===0)deck=shuffle([...DECKS[mode]]); renderCard(); }
+
+function checkReward(){
+  if(starsEarned<STAR_AT.length && cardsViewed>=STAR_AT[starsEarned]){
+    starsEarned++;
+    updateStars(starsEarned);
+    launchConfetti();
+    setTimeout(()=>showReward(starsEarned),500);
+  }
+}
+function updateStars(n){ for(let i=1;i<=5;i++) document.getElementById('st'+i).className='star'+(i<=n?' lit':''); }
+function showReward(n){
+  const r=REWARDS[n-1], ov=document.getElementById('rewardOverlay');
+  document.getElementById('rEmoji').textContent=r.emoji;
+  document.getElementById('rTitle').textContent=r.title;
+  document.getElementById('rSub').textContent=r.sub;
+  document.getElementById('rBtn').style.background=COLORS[mode].hex;
+  ov.classList.add('show');
+}
+function closeReward(){ document.getElementById('rewardOverlay').classList.remove('show'); }
+
+function launchConfetti(){
+  const w=document.getElementById('confettiWrap'); w.innerHTML='';
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div'); p.className='cp';
+    p.style.cssText=`left:${Math.random()*100}vw;
+      background:${CONFETTI[Math.floor(Math.random()*CONFETTI.length)]};
+      width:${7+Math.random()*9}px; height:${7+Math.random()*9}px;
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation-delay:${Math.random()*.9}s;
+      animation-duration:${1.3+Math.random()*.9}s;`;
+    w.appendChild(p);
+  }
+  setTimeout(()=>w.innerHTML='',2800);
+}
+
+/* ═══════════════════════════ INIT ═══════════════════════════ */
+deck=shuffle([...DECKS[mode]]);
+renderCard();
+</script>
+</body>
+</html>
